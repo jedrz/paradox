@@ -780,6 +780,19 @@ With prefix N, move to the N-th next entry."
      (mapcar 'car paradox--upgradeable-packages))
     (setq paradox--current-filter "Upgrade")))
 
+(defun paradox-filter-installed ()
+  "Show only installed packages."
+  (interactive)
+  (if (zerop (paradox--cas "installed"))
+      (message "No installed packages.")
+    (package-show-package-list
+     (->> tabulated-list-entries
+       (-filter (lambda (entry)
+                  (let ((status (aref (cadr entry) 2)))
+                    (string= status "installed"))))
+       (-map 'caar)))
+    (setq paradox--current-filter "Installed")))
+
 (define-derived-mode paradox-menu-mode tabulated-list-mode "Paradox Menu"
   "Major mode for browsing a list of packages.
 Letters do not insert themselves; instead, they are commands.
